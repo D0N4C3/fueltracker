@@ -9,6 +9,7 @@ import { useFuel } from "@/context/FuelContext";
 import { useLocation } from "@/context/LocationContext";
 import { FuelStation } from "@/types";
 import { Radius, Shadows, Spacing, Typography, Colors } from "@/constants/design";
+import { ThemeColors } from "@/constants/colors";
 import { StationCard } from "@/components/StationCard";
 import { SkeletonList } from "@/components/Skeleton";
 import { EmptyState } from "@/components/EmptyState";
