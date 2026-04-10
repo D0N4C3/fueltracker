@@ -275,10 +275,23 @@ export default function PremiumFuelTrackerHome() {
   const { stations, isLoading, selectedStation, setSelectedStation, filter, setFilter } = useFuel();
   const { location, isTracking, queueDetection } = useLocation();
 
-  const [region, setRegion] = useState<Region>(DEFAULT_REGION);
+  const mapRef = useRef<MapView | null>(null);
+  const hasCenteredOnInitialLocation = useRef(false);
+  const [isFollowingUser, setIsFollowingUser] = useState(true);
+  const [currentMapRegion, setCurrentMapRegion] = useState<Region>(DEFAULT_REGION);
   const [showFilters, setShowFilters] = useState(false);
   const [showQuickReport, setShowQuickReport] = useState(false);
   const [bottomSheetExpanded, setBottomSheetExpanded] = useState(false);
+
+  const initialRegion = useMemo<Region>(() => {
+    if (!location) return DEFAULT_REGION;
+    return {
+      latitude: location.latitude,
+      longitude: location.longitude,
+      latitudeDelta: LATITUDE_DELTA,
+      longitudeDelta: LONGITUDE_DELTA,
+    };
+  }, [location]);
 
   // Animation refs
   const sheetHeight = useRef(new Animated.Value(Layout.bottomSheet.collapsed)).current;
@@ -341,17 +354,23 @@ export default function PremiumFuelTrackerHome() {
     router.push(`/station/${station.id}`);
   }, [router]);
 
+  const recenterOnUser = useCallback((resetZoom = false) => {
+    if (!location || !mapRef.current) return;
+    const latitudeDelta = resetZoom ? LATITUDE_DELTA : currentMapRegion.latitudeDelta;
+    const longitudeDelta = resetZoom ? LONGITUDE_DELTA : currentMapRegion.longitudeDelta;
+    mapRef.current.animateToRegion({
+      latitude: location.latitude,
+      longitude: location.longitude,
+      latitudeDelta,
+      longitudeDelta,
+    }, 350);
+  }, [location, currentMapRegion.latitudeDelta, currentMapRegion.longitudeDelta]);
+
   const handleCenterOnUser = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (location) {
-      setRegion({
-        latitude: location.latitude,
-        longitude: location.longitude,
-        latitudeDelta: LATITUDE_DELTA / 3,
-        longitudeDelta: LONGITUDE_DELTA / 3,
-      });
-    }
-  }, [location]);
+    setIsFollowingUser(true);
+    recenterOnUser(false);
+  }, [recenterOnUser]);
 
   const toggleFilters = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -395,23 +414,33 @@ export default function PremiumFuelTrackerHome() {
 
   // Effects
   useEffect(() => {
-    if (location) {
-      setRegion({
-        latitude: location.latitude,
-        longitude: location.longitude,
-        latitudeDelta: LATITUDE_DELTA,
-        longitudeDelta: LONGITUDE_DELTA,
-      });
+    if (!location || !mapRef.current) return;
+
+    if (!hasCenteredOnInitialLocation.current) {
+      hasCenteredOnInitialLocation.current = true;
+      recenterOnUser(false);
+      return;
     }
-  }, [location]);
+
+    if (isFollowingUser) {
+      recenterOnUser(false);
+    }
+  }, [location, isFollowingUser, recenterOnUser]);
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Map */}
       <MapView
+        ref={mapRef}
         style={StyleSheet.absoluteFill}
-        region={region}
-        onRegionChangeComplete={setRegion}
+        initialRegion={initialRegion}
+        onPanDrag={() => setIsFollowingUser(false)}
+        onRegionChangeComplete={(nextRegion, details) => {
+          setCurrentMapRegion(nextRegion);
+          if (details?.isGesture) {
+            setIsFollowingUser(false);
+          }
+        }}
         showsUserLocation
         showsMyLocationButton={false}
         showsCompass={false}
@@ -515,6 +544,24 @@ export default function PremiumFuelTrackerHome() {
       />
 
       {/* Location Button */}
+      <View
+        style={[
+          styles.followModeIndicator,
+          {
+            bottom: Layout.bottomSheet.collapsed + insets.bottom + Spacing[4] + 56,
+            backgroundColor: theme.surface,
+          },
+        ]}
+      >
+        <Text
+          style={[
+            styles.followModeIndicatorText,
+            { color: isFollowingUser ? theme.accent : theme.text.secondary },
+          ]}
+        >
+          {isFollowingUser ? "Following" : "Free explore"}
+        </Text>
+      </View>
       <TouchableOpacity
         style={[
           styles.locationButton,
@@ -841,6 +888,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     ...Shadows.lg,
     zIndex: 5,
+  },
+  followModeIndicator: {
+    position: 'absolute',
+    right: Spacing[4],
+    paddingHorizontal: Spacing[3],
+    paddingVertical: Spacing[2],
+    borderRadius: Radius.full,
+    ...Shadows.md,
+    zIndex: 5,
+  },
+  followModeIndicatorText: {
+    fontSize: Typography.sizes.xs,
+    fontWeight: '700',
   },
   fabContainer: {
     position: 'absolute',
