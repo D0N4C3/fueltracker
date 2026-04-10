@@ -51,6 +51,7 @@ import { FloatingActionButton } from "@/components/AnimatedButton";
 import { SkeletonList, SkeletonBestStation } from "@/components/Skeleton";
 import { EmptyState } from "@/components/EmptyState";
 import { QuickReportSheet } from "@/components/QuickReportSheet";
+import { IconButton } from "@/components/ui-system";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -457,35 +458,10 @@ export default function PremiumFuelTrackerHome() {
           </View>
 
           <View style={styles.headerActions}>
-            <TouchableOpacity
-              style={[styles.iconButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]}
-              onPress={toggleTheme}
-            >
-              {isDark ? <Sun size={20} color={theme.text.primary} /> : <Moon size={20} color={theme.text.primary} />}
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.iconButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]}
-              onPress={() => router.push('/stations')}
-            >
-              <List size={20} color={theme.text.primary} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.iconButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]}
-              onPress={() => router.push('/profile')}
-            >
-              <User size={20} color={theme.text.primary} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.filterButton,
-                {
-                  backgroundColor: showFilters ? theme.accent : isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                },
-              ]}
-              onPress={toggleFilters}
-            >
-              <SlidersHorizontal size={20} color={showFilters ? '#fff' : theme.text.primary} />
-            </TouchableOpacity>
+            <IconButton onPress={toggleTheme} icon={isDark ? <Sun size={20} color={theme.text.primary} /> : <Moon size={20} color={theme.text.primary} />} />
+            <IconButton onPress={() => router.push('/stations')} icon={<List size={20} color={theme.text.primary} />} />
+            <IconButton onPress={() => router.push('/profile')} icon={<User size={20} color={theme.text.primary} />} />
+            <IconButton onPress={toggleFilters} active={showFilters} icon={<SlidersHorizontal size={20} color={showFilters ? '#fff' : theme.text.primary} />} />
           </View>
         </View>
 
@@ -515,18 +491,9 @@ export default function PremiumFuelTrackerHome() {
       />
 
       {/* Location Button */}
-      <TouchableOpacity
-        style={[
-          styles.locationButton,
-          {
-            bottom: Layout.bottomSheet.collapsed + insets.bottom + Spacing[4],
-            backgroundColor: theme.surface,
-          },
-        ]}
-        onPress={handleCenterOnUser}
-      >
-        <Navigation size={20} color={theme.accent} />
-      </TouchableOpacity>
+      <View style={[styles.locationButton, { bottom: Layout.bottomSheet.collapsed + insets.bottom + Spacing[4] }]}>
+        <IconButton onPress={handleCenterOnUser} icon={<Navigation size={20} color={theme.accent} />} />
+      </View>
 
       {/* FAB */}
       <View style={[styles.fabContainer, { bottom: insets.bottom + Layout.bottomSheet.collapsed + Spacing[4] }]}>
@@ -707,20 +674,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: Spacing[1.5],
   },
-  iconButton: {
-    width: 38,
-    height: 38,
-    borderRadius: Radius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  filterButton: {
-    width: 38,
-    height: 38,
-    borderRadius: Radius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   filtersContainer: {
     overflow: 'hidden',
   },
@@ -834,12 +787,7 @@ const styles = StyleSheet.create({
   locationButton: {
     position: 'absolute',
     right: Spacing[4],
-    width: 48,
-    height: 48,
-    borderRadius: Radius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...Shadows.lg,
+    ...Shadows.sm,
     zIndex: 5,
   },
   fabContainer: {

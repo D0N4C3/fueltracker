@@ -12,6 +12,7 @@ import { Radius, Spacing, Typography, Colors, Shadows } from "@/constants/design
 import { StationCard } from "@/components/StationCard";
 import { SkeletonList } from "@/components/Skeleton";
 import { EmptyState } from "@/components/EmptyState";
+import { IconButton, ScreenHeader } from "@/components/ui-system";
 import * as Haptics from "expo-haptics";
 
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
@@ -162,39 +163,28 @@ export default function StationsListPage() {
         style={[styles.header, { paddingTop: insets.top + Spacing[2] }]}
       >
         <View style={styles.headerContent}>
-          <TouchableOpacity
-            style={[styles.headerBtn, { backgroundColor: theme.surface, borderColor: theme.border }]}
-            onPress={() => router.back()}
-          >
-            <ChevronLeft size={22} color={theme.text.primary} />
-          </TouchableOpacity>
-
-          <View style={styles.headerTitleContainer}>
-            <Text style={[styles.headerTitle, { color: theme.text.primary }]}>Stations</Text>
-            <Text style={[styles.headerSubtitle, { color: theme.text.tertiary }]}>
-              {filteredStations.length} matching
-            </Text>
-          </View>
-
-          <TouchableOpacity
-            style={[
-              styles.headerBtn,
-              {
-                backgroundColor: showFilters ? theme.accent : theme.surface,
-                borderColor: showFilters ? theme.accent : theme.border,
-              },
-            ]}
-            onPress={() => setShowFilters(!showFilters)}
-          >
-            <SlidersHorizontal size={18} color={showFilters ? '#fff' : theme.text.primary} />
-            {activeFiltersCount > 0 && (
-              <View style={[styles.badge, { backgroundColor: showFilters ? '#fff' : Colors.error.DEFAULT }]}> 
-                <Text style={[styles.badgeText, { color: showFilters ? theme.accent : '#fff' }]}> 
-                  {activeFiltersCount}
-                </Text>
+          <ScreenHeader
+            title="Stations"
+            subtitle={`${filteredStations.length} matching`}
+            centerTitle
+            leftAction={<IconButton onPress={() => router.back()} icon={<ChevronLeft size={22} color={theme.text.primary} />} />}
+            rightActions={
+              <View>
+                <IconButton
+                  onPress={() => setShowFilters(!showFilters)}
+                  active={showFilters}
+                  icon={<SlidersHorizontal size={18} color={showFilters ? '#fff' : theme.text.primary} />}
+                />
+                {activeFiltersCount > 0 && (
+                  <View style={[styles.badge, { backgroundColor: showFilters ? '#fff' : Colors.error.DEFAULT }]}>
+                    <Text style={[styles.badgeText, { color: showFilters ? theme.accent : '#fff' }]}>
+                      {activeFiltersCount}
+                    </Text>
+                  </View>
+                )}
               </View>
-            )}
-          </TouchableOpacity>
+            }
+          />
         </View>
 
         <View style={[styles.searchContainer, { backgroundColor: theme.surface, borderColor: theme.border }]}>
@@ -275,27 +265,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: Spacing[3],
     marginBottom: Spacing[3],
-  },
-  headerBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: Radius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-  },
-  headerTitleContainer: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: Typography.sizes.xl,
-    fontWeight: '700',
-  },
-  headerSubtitle: {
-    fontSize: Typography.sizes.xs,
-    fontWeight: '500',
-    marginTop: 1,
   },
   badge: {
     position: 'absolute',

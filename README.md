@@ -7,6 +7,17 @@ This is a native cross-platform mobile app created with [Rork](https://rork.com)
 **Platform**: Native iOS & Android app, exportable to web
 **Framework**: Expo Router + React Native
 
+## Design QA checklist (for new screens)
+
+Use this quick pass before merging UI work:
+
+- **Spacing rhythm**: Base layout on the 8pt rhythm (`8/16/24/32`), and use compact spacing only for dense controls.
+- **Contrast**: Verify text/icon contrast against surfaces in both light and dark themes.
+- **Hierarchy**: Ensure each screen has a clear title, supportive subtitle/meta, and a single primary action.
+- **Touch targets**: Keep interactive controls at ~44x44pt minimum (icon buttons, chips, floating actions).
+- **Consistency**: Reuse shared UI primitives (`ScreenHeader`, `PanelCard`, `StatusPill`, `MetricRow`) before creating one-off styles.
+- **Semantic color only**: Reserve fuel/queue state colors for actual fuel/queue status communication (not decoration).
+
 ## How can I edit this code?
 
 There are several ways of editing your native mobile application.

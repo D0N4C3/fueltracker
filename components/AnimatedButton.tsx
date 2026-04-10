@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/context/ThemeContext';
-import { Radius, Shadows, Spacing } from '@/constants/design';
+import { Layout, Radius, Shadows, Spacing } from '@/constants/design';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'outline' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
@@ -236,7 +236,7 @@ export const FloatingActionButton: React.FC<FABProps> = ({
     onPress();
   }, [onPress]);
 
-  const dimensions = size === 'lg' ? 60 : 48;
+  const dimensions = size === 'lg' ? Layout.fab.size : Layout.header.iconButtonSize;
   const backgroundColor = variant === 'primary' ? theme.accent : theme.surface;
   const iconColor = variant === 'primary' ? '#fff' : theme.text.primary;
 
