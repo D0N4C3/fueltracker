@@ -31,7 +31,7 @@ const SettingsItem: React.FC<{
         <Text style={[styles.settingsTitle, { color: theme.text.primary }]}>{title}</Text>
         {subtitle ? <Text style={[styles.settingsSubtitle, { color: theme.text.tertiary }]}>{subtitle}</Text> : null}
       </View>
-      {rightElement || (onPress ? <ChevronRight size={18} color={theme.text.tertiary} /> : null)}
+      {rightElement || (onPress ? <ChevronRight size={16} color={theme.text.tertiary} /> : null)}
     </TouchableOpacity>
   );
 };
@@ -40,7 +40,7 @@ const StatCard = ({ value, label, icon, color }: { value: string; label: string;
   const { theme } = useTheme();
   return (
     <View style={[styles.statCard, { backgroundColor: theme.surfaceElevated, borderColor: theme.border, ...Shadows.sm }]}>
-      <View style={[styles.statIcon, { backgroundColor: `${color}18` }]}>{React.cloneElement(icon as React.ReactElement, { color })}</View>
+      <View style={[styles.statIcon, { backgroundColor: `${color}18` }]}>{React.cloneElement(icon as React.ReactElement, { color, size: 14 })}</View>
       <Text style={[styles.statValue, { color: theme.text.primary }]}>{value}</Text>
       <Text style={[styles.statLabel, { color: theme.text.tertiary }]}>{label}</Text>
     </View>
@@ -63,7 +63,7 @@ export default function ProfilePage() {
     <View style={[styles.container, { backgroundColor: theme.background }]}> 
       <LinearGradient
         colors={isDark ? ['#182644', '#0e1729'] : ['#dde6ff', '#f4f6fb']}
-        style={[styles.hero, { paddingTop: insets.top + Spacing[2] }]}
+        style={[styles.hero, { paddingTop: insets.top + Spacing[1] }]}
       >
         <View style={styles.header}>
           <ScreenHeader
@@ -86,19 +86,24 @@ export default function ProfilePage() {
         </PanelCard>
       </LinearGradient>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: Spacing[4], paddingBottom: insets.bottom + Spacing[6], gap: Spacing[4] }}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: Spacing[4], paddingTop: Spacing[3], paddingBottom: insets.bottom + Spacing[5], gap: Spacing[3] }}>
         <View style={[styles.section, { backgroundColor: theme.surface, borderColor: theme.border, ...Shadows.sm }]}>
-          <Text style={[styles.sectionTitle, { color: theme.text.tertiary }]}>PREFERENCES</Text>
-          <SettingsItem icon={<Moon size={20} />} title="Dark Mode" subtitle={isDark ? 'Enabled' : 'Disabled'} rightElement={<Switch value={isDark} onValueChange={toggleTheme} trackColor={{ false: theme.border, true: theme.accent }} thumbColor="#fff" />} />
-          <SettingsItem icon={<Bell size={20} />} title="Push Notifications" subtitle="Get alerts about nearby stations" rightElement={<Switch value={notifications} onValueChange={setNotifications} trackColor={{ false: theme.border, true: theme.accent }} thumbColor="#fff" />} />
-          <SettingsItem icon={<MapPin size={20} />} title="Smart Queue Detection" subtitle="Auto-detect when you're in a queue" rightElement={<Switch value={smartDetection} onValueChange={setSmartDetection} trackColor={{ false: theme.border, true: theme.accent }} thumbColor="#fff" />} />
+          <Text style={[styles.sectionTitle, { color: theme.text.tertiary }]}>QUICK CONTROLS</Text>
+          <SettingsItem icon={<User size={18} />} title="Edit Profile" subtitle="Update your name and details" onPress={() => Alert.alert('Edit profile', 'Profile editing coming soon.')} />
+          <SettingsItem icon={<Bell size={18} />} title="Notifications" subtitle="Nearby station and queue alerts" rightElement={<Switch value={notifications} onValueChange={setNotifications} trackColor={{ false: theme.border, true: theme.accent }} thumbColor="#fff" />} />
+          <SettingsItem icon={<Moon size={18} />} title="Theme" subtitle={isDark ? 'Dark mode' : 'Light mode'} rightElement={<Switch value={isDark} onValueChange={toggleTheme} trackColor={{ false: theme.border, true: theme.accent }} thumbColor="#fff" />} />
         </View>
 
         <View style={[styles.section, { backgroundColor: theme.surface, borderColor: theme.border, ...Shadows.sm }]}>
+          <Text style={[styles.sectionTitle, { color: theme.text.tertiary }]}>PREFERENCES</Text>
+          <SettingsItem icon={<MapPin size={18} />} title="Smart Queue Detection" subtitle="Auto-detect when you're in a queue" rightElement={<Switch value={smartDetection} onValueChange={setSmartDetection} trackColor={{ false: theme.border, true: theme.accent }} thumbColor="#fff" />} />
+        </View>
+
+        <View style={[styles.section, { backgroundColor: theme.surface, borderColor: theme.border, ...Shadows.sm }]}> 
           <Text style={[styles.sectionTitle, { color: theme.text.tertiary }]}>ABOUT</Text>
-          <SettingsItem icon={<Info size={20} />} title="About FuelFinder" subtitle="Version 1.0.0" onPress={() => Alert.alert('About', 'FuelFinder Ethiopia v1.0.0')} />
-          <SettingsItem icon={<Shield size={20} />} title="Privacy Policy" onPress={() => Alert.alert('Privacy', 'Your privacy is important to us.')} />
-          <SettingsItem icon={<FileText size={20} />} title="Terms of Service" onPress={() => Alert.alert('Terms', 'By using FuelFinder, you agree to our terms.')} />
+          <SettingsItem icon={<Info size={18} />} title="About FuelFinder" subtitle="Version 1.0.0" onPress={() => Alert.alert('About', 'FuelFinder Ethiopia v1.0.0')} />
+          <SettingsItem icon={<Shield size={18} />} title="Privacy Policy" onPress={() => Alert.alert('Privacy', 'Your privacy is important to us.')} />
+          <SettingsItem icon={<FileText size={18} />} title="Terms of Service" onPress={() => Alert.alert('Terms', 'By using FuelFinder, you agree to our terms.')} />
         </View>
       </ScrollView>
     </View>
@@ -123,6 +128,6 @@ const styles = StyleSheet.create({
   settingsItem: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing[4], paddingVertical: Spacing[3], borderBottomWidth: 1, gap: Spacing[3] },
   settingsIcon: { width: 42, height: 42, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
   settingsContent: { flex: 1 },
-  settingsTitle: { fontSize: Typography.sizes.lg, fontWeight: '600' },
-  settingsSubtitle: { fontSize: Typography.sizes.sm, marginTop: 2 },
+  settingsTitle: { fontSize: Typography.sizes.base, fontWeight: '600' },
+  settingsSubtitle: { fontSize: Typography.sizes.xs, marginTop: 1 },
 });
