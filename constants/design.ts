@@ -88,10 +88,10 @@ export const Colors = {
 // LIGHT THEME
 // ============================================
 export const LightTheme = {
-  background: '#f8fafc',
+  background: '#f3f6fb',
   surface: '#ffffff',
-  surfaceElevated: '#ffffff',
-  surfacePressed: '#f1f5f9',
+  surfaceElevated: '#fcfdff',
+  surfacePressed: '#eef3fb',
   
   text: {
     primary: '#0f172a',
@@ -100,8 +100,8 @@ export const LightTheme = {
     inverse: '#ffffff',
   },
   
-  border: '#e2e8f0',
-  borderSubtle: '#f1f5f9',
+  border: '#dbe4f2',
+  borderSubtle: '#edf2f9',
   divider: '#e2e8f0',
   
   shadow: {
@@ -111,18 +111,18 @@ export const LightTheme = {
     xl: 'rgba(0, 0, 0, 0.12)',
   },
   
-  accent: Colors.primary[600],
-  accentLight: Colors.primary[100],
+  accent: '#2563eb',
+  accentLight: '#e5edff',
 };
 
 // ============================================
 // DARK THEME
 // ============================================
 export const DarkTheme = {
-  background: '#0f172a',
-  surface: '#1e293b',
-  surfaceElevated: '#334155',
-  surfacePressed: '#475569',
+  background: '#0b1220',
+  surface: '#121c2f',
+  surfaceElevated: '#1a2942',
+  surfacePressed: '#253756',
   
   text: {
     primary: '#f8fafc',
@@ -131,9 +131,9 @@ export const DarkTheme = {
     inverse: '#0f172a',
   },
   
-  border: '#334155',
-  borderSubtle: '#1e293b',
-  divider: '#334155',
+  border: '#2a3d60',
+  borderSubtle: '#1a2942',
+  divider: '#2a3d60',
   
   shadow: {
     sm: 'rgba(0, 0, 0, 0.3)',
@@ -142,8 +142,8 @@ export const DarkTheme = {
     xl: 'rgba(0, 0, 0, 0.6)',
   },
   
-  accent: Colors.primary[400],
-  accentLight: Colors.primary[900],
+  accent: '#60a5fa',
+  accentLight: '#1e3a8a',
 };
 
 // ============================================
