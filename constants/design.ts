@@ -15,30 +15,10 @@ export const Colors = {
     800: '#2f44ac',
     900: '#293b88',
   },
-  success: {
-    light: '#dff8ec',
-    DEFAULT: '#21b26f',
-    dark: '#168852',
-    glow: 'rgba(33,178,111,0.35)',
-  },
-  warning: {
-    light: '#fff2d8',
-    DEFAULT: '#f4ab3d',
-    dark: '#c98722',
-    glow: 'rgba(244,171,61,0.35)',
-  },
-  error: {
-    light: '#ffe0df',
-    DEFAULT: '#ee5f67',
-    dark: '#cc3b44',
-    glow: 'rgba(238,95,103,0.35)',
-  },
-  info: {
-    light: '#deefff',
-    DEFAULT: '#2f9cff',
-    dark: '#1d74d9',
-    glow: 'rgba(47,156,255,0.35)',
-  },
+  success: { light: '#dff8ec', DEFAULT: '#21b26f', dark: '#168852', glow: 'rgba(33,178,111,0.35)' },
+  warning: { light: '#fff2d8', DEFAULT: '#f4ab3d', dark: '#c98722', glow: 'rgba(244,171,61,0.35)' },
+  error: { light: '#ffe0df', DEFAULT: '#ee5f67', dark: '#cc3b44', glow: 'rgba(238,95,103,0.35)' },
+  info: { light: '#deefff', DEFAULT: '#2f9cff', dark: '#1d74d9', glow: 'rgba(47,156,255,0.35)' },
   fuel: {
     available: '#21b26f',
     petrol: '#2f9cff',
@@ -74,6 +54,7 @@ export const LightTheme = {
   surface: '#ffffff',
   surfaceElevated: '#fdfdff',
   surfacePressed: '#eef1f8',
+  overlay: 'rgba(15, 23, 42, 0.4)',
   text: {
     primary: '#111827',
     secondary: '#4b5565',
@@ -86,11 +67,15 @@ export const LightTheme = {
   shadow: {
     sm: 'rgba(15, 23, 42, 0.06)',
     md: 'rgba(15, 23, 42, 0.10)',
-    lg: 'rgba(15, 23, 42, 0.14)',
-    xl: 'rgba(15, 23, 42, 0.20)',
   },
   accent: '#4867f4',
   accentLight: '#e6ebff',
+  semanticSurface: {
+    background: '#f4f6fb',
+    surface: '#ffffff',
+    elevated: '#fdfdff',
+    overlay: 'rgba(15, 23, 42, 0.4)',
+  },
 };
 
 export const DarkTheme = {
@@ -98,6 +83,7 @@ export const DarkTheme = {
   surface: '#111a2c',
   surfaceElevated: '#17243b',
   surfacePressed: '#1f304d',
+  overlay: 'rgba(1, 4, 9, 0.68)',
   text: {
     primary: '#f7f9ff',
     secondary: '#c2cee4',
@@ -110,11 +96,15 @@ export const DarkTheme = {
   shadow: {
     sm: 'rgba(1, 4, 9, 0.35)',
     md: 'rgba(1, 4, 9, 0.45)',
-    lg: 'rgba(1, 4, 9, 0.55)',
-    xl: 'rgba(1, 4, 9, 0.68)',
   },
   accent: '#8aa8ff',
   accentLight: '#1e2d52',
+  semanticSurface: {
+    background: '#070d19',
+    surface: '#111a2c',
+    elevated: '#17243b',
+    overlay: 'rgba(1, 4, 9, 0.68)',
+  },
 };
 
 export const Typography = {
@@ -128,31 +118,75 @@ export const Typography = {
     '3xl': 30,
     '4xl': 36,
   },
+  roles: {
+    title: { lg: 28, md: 22, sm: 18 },
+    subtitle: { lg: 18, md: 16, sm: 14 },
+    body: { lg: 16, md: 15, sm: 13 },
+    meta: { lg: 13, md: 12, sm: 11 },
+  },
   weights: {
     normal: '400' as const,
     medium: '500' as const,
     semibold: '600' as const,
     bold: '700' as const,
   },
-  lineHeights: {
-    tight: 1.25,
-    normal: 1.5,
-    relaxed: 1.75,
+  lineHeights: { tight: 1.25, normal: 1.5, relaxed: 1.75 },
+};
+
+export const Spacing = {
+  px: 1,
+  0.5: 2,
+  1: 4,
+  1.5: 6,
+  2: 8,
+  2.5: 10,
+  3: 12,
+  3.5: 14,
+  4: 16,
+  5: 20,
+  6: 24,
+  7: 28,
+  8: 32,
+  9: 36,
+  10: 40,
+  11: 44,
+  12: 48,
+  16: 64,
+  20: 80,
+  24: 96,
+  rhythm: { xxs: 4, xs: 8, sm: 16, md: 24, lg: 32, xl: 40, '2xl': 48 },
+  compact: { xs: 4, sm: 8, md: 12, lg: 16, xl: 24 },
+};
+
+export const Radius = {
+  none: 0,
+  sm: 6,
+  DEFAULT: 10,
+  md: 14,
+  lg: 18,
+  xl: 24,
+  '2xl': 30,
+  '3xl': 38,
+  full: 9999,
+  tiers: {
+    component: 10,
+    panel: 16,
+    shell: 24,
   },
 };
 
-export const Spacing = { px: 1, 0.5: 2, 1: 4, 1.5: 6, 2: 8, 2.5: 10, 3: 12, 3.5: 14, 4: 16, 5: 20, 6: 24, 7: 28, 8: 32, 9: 36, 10: 40, 11: 44, 12: 48, 16: 64, 20: 80, 24: 96 };
-
-export const Radius = { none: 0, sm: 6, DEFAULT: 10, md: 14, lg: 18, xl: 24, '2xl': 30, '3xl': 38, full: 9999 };
+const shadowBase = { shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 14, elevation: 4 };
+const shadowRaised = { shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.12, shadowRadius: 20, elevation: 8 };
 
 export const Shadows = {
-  sm: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.06, shadowRadius: 12, elevation: 2 },
-  md: { shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.1, shadowRadius: 20, elevation: 6 },
-  lg: { shadowColor: '#000', shadowOffset: { width: 0, height: 16 }, shadowOpacity: 0.14, shadowRadius: 28, elevation: 10 },
-  xl: { shadowColor: '#000', shadowOffset: { width: 0, height: 24 }, shadowOpacity: 0.18, shadowRadius: 40, elevation: 14 },
-  '2xl': { shadowColor: '#000', shadowOffset: { width: 0, height: 34 }, shadowOpacity: 0.22, shadowRadius: 52, elevation: 18 },
-  glow: (color: string) => ({ shadowColor: color, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.5, shadowRadius: 14, elevation: 8 }),
-  inner: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 1 },
+  none: {},
+  sm: shadowBase,
+  md: shadowRaised,
+  lg: shadowRaised,
+  xl: shadowRaised,
+  '2xl': shadowRaised,
+  glow: (color: string) => ({ shadowColor: color, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.35, shadowRadius: 10, elevation: 6 }),
+  inner: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 1 },
 };
 
 export const Animations = {
@@ -165,8 +199,8 @@ export const Layout = {
   screenWidth: SCREEN_WIDTH,
   screenHeight: SCREEN_HEIGHT,
   bottomSheet: { collapsed: 140, half: SCREEN_HEIGHT * 0.5, expanded: SCREEN_HEIGHT * 0.85 },
-  card: { borderRadius: Radius.xl, padding: Spacing[5] },
-  header: { height: 56, blurIntensity: Platform.OS === 'ios' ? 80 : 100 },
+  card: { borderRadius: Radius.tiers.panel, padding: Spacing.rhythm.sm },
+  header: { height: 56, blurIntensity: Platform.OS === 'ios' ? 80 : 100, iconButtonSize: 44 },
   fab: { size: 56, bottomOffset: 24, rightOffset: 20 },
 };
 

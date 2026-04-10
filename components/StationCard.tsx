@@ -2,10 +2,11 @@ import React, { useMemo, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { Clock, Navigation, Zap, Fuel, AlertCircle, ChevronRight, Sparkles } from 'lucide-react-native';
 import { useTheme } from '@/context/ThemeContext';
-import { FuelStation, QueueLevel, FuelType } from '@/types';
-import { Radius, Shadows, Spacing, Typography, getFuelColor, getQueueColor, getQueueProgress } from '@/constants/design';
-import { formatTimeAgo } from '@/mocks/stations';
+import { FuelStation, FuelType } from '@/types';
+import { Radius, Spacing, Typography, getFuelColor, getQueueColor, getQueueProgress } from '@/constants/design';
+import { formatTimeAgo, getQueueLevelText } from '@/mocks/stations';
 import * as Haptics from 'expo-haptics';
+import { MetricRow, PanelCard, StatusPill } from '@/components/ui-system';
 
 interface StationCardProps {
   station: FuelStation;
@@ -15,7 +16,7 @@ interface StationCardProps {
   style?: any;
 }
 
-const FuelBadge: React.FC<{ status: FuelType }> = ({ status }) => {
+const FuelDot: React.FC<{ status: FuelType }> = ({ status }) => {
   const color = getFuelColor(status);
   const icon = useMemo(() => {
     switch (status) {
@@ -27,17 +28,6 @@ const FuelBadge: React.FC<{ status: FuelType }> = ({ status }) => {
   }, [status]);
 
   return <View style={[styles.fuelBadge, { backgroundColor: color }]}>{icon}</View>;
-};
-
-const QueueBadge: React.FC<{ level: QueueLevel }> = ({ level }) => {
-  const color = getQueueColor(level);
-  const label = { none: 'No queue', short: 'Short', medium: 'Medium', long: 'Long', unknown: 'Unknown' }[level];
-  return (
-    <View style={[styles.queueBadge, { backgroundColor: `${color}1F` }]}>
-      <View style={[styles.queueDot, { backgroundColor: color }]} />
-      <Text style={[styles.queueText, { color }]}>{label}</Text>
-    </View>
-  );
 };
 
 export const StationCard: React.FC<StationCardProps> = ({ station, onPress, distance, isBest = false, style }) => {
@@ -55,59 +45,54 @@ export const StationCard: React.FC<StationCardProps> = ({ station, onPress, dist
   }, [distance]);
 
   return (
-    <Animated.View style={[{ transform: [{ scale: scaleAnim }] }, style]}>
+    <Animated.View style={[{ transform: [{ scale: scaleAnim }] }, style, styles.wrapper]}>
       <TouchableOpacity
         onPressIn={() => Animated.spring(scaleAnim, { toValue: 0.98, useNativeDriver: true, friction: 8, tension: 300 }).start()}
         onPressOut={() => Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true, friction: 8, tension: 300 }).start()}
         onPress={handlePress}
         activeOpacity={1}
-        style={[styles.container, { backgroundColor: theme.surface, borderColor: theme.border, ...Shadows.md }]}
       >
-        {isBest && <View style={[styles.ribbon, { backgroundColor: theme.accent }]}><Sparkles size={12} color="#fff" /><Text style={styles.ribbonText}>Top Pick</Text></View>}
+        <PanelCard>
+          {isBest && <View style={[styles.ribbon, { backgroundColor: theme.accent }]}><Sparkles size={12} color="#fff" /><Text style={styles.ribbonText}>Top Pick</Text></View>}
 
-        <View style={styles.headerRow}>
-          <View style={{ flex: 1 }}>
-            <Text numberOfLines={1} style={[styles.name, { color: theme.text.primary }]}>{station.name}</Text>
-            <Text numberOfLines={1} style={[styles.address, { color: theme.text.tertiary }]}>{station.address}</Text>
+          <View style={styles.headerRow}>
+            <View style={{ flex: 1 }}>
+              <Text numberOfLines={1} style={[styles.name, { color: theme.text.primary }]}>{station.name}</Text>
+              <Text numberOfLines={1} style={[styles.address, { color: theme.text.tertiary }]}>{station.address}</Text>
+            </View>
+            <FuelDot status={station.currentStatus.fuelAvailable} />
           </View>
-          <FuelBadge status={station.currentStatus.fuelAvailable} />
-        </View>
 
-        <View style={styles.metaRow}>
-          <QueueBadge level={station.currentStatus.queueLevel} />
-          <View style={styles.metaItem}><Clock size={13} color={theme.text.tertiary} /><Text style={[styles.metaText, { color: theme.text.tertiary }]}>{formatTimeAgo(station.currentStatus.lastUpdated)}</Text></View>
-          {formattedDistance ? <View style={styles.metaItem}><Navigation size={13} color={theme.text.tertiary} /><Text style={[styles.metaText, { color: theme.text.tertiary }]}>{formattedDistance}</Text></View> : null}
-        </View>
+          <View style={styles.statusRow}>
+            <StatusPill label={getQueueLevelText(station.currentStatus.queueLevel)} color={getQueueColor(station.currentStatus.queueLevel)} />
+            <MetricRow icon={<Clock size={13} color={theme.text.tertiary} />} label="updated" value={formatTimeAgo(station.currentStatus.lastUpdated)} />
+            {formattedDistance ? <MetricRow icon={<Navigation size={13} color={theme.text.tertiary} />} label="away" value={formattedDistance} /> : null}
+          </View>
 
-        <View style={[styles.track, { backgroundColor: theme.surfacePressed }]}>
-          <View style={[styles.fill, { width: `${getQueueProgress(station.currentStatus.queueLevel) * 100}%`, backgroundColor: getQueueColor(station.currentStatus.queueLevel) }]} />
-        </View>
+          <View style={[styles.track, { backgroundColor: theme.surfacePressed }]}> 
+            <View style={[styles.fill, { width: `${getQueueProgress(station.currentStatus.queueLevel) * 100}%`, backgroundColor: getQueueColor(station.currentStatus.queueLevel) }]} />
+          </View>
 
-        <View style={styles.footer}>
-          <Text style={[styles.confidence, { color: theme.text.secondary }]}>{Math.round(station.currentStatus.confidence * 100)}% confidence</Text>
-          <ChevronRight size={18} color={theme.text.tertiary} />
-        </View>
+          <View style={styles.footer}>
+            <MetricRow icon={<AlertCircle size={13} color={theme.text.tertiary} />} label="confidence" value={`${Math.round(station.currentStatus.confidence * 100)}%`} />
+            <ChevronRight size={18} color={theme.text.tertiary} />
+          </View>
+        </PanelCard>
       </TouchableOpacity>
     </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { borderWidth: 1, borderRadius: Radius.xl, padding: Spacing[4], marginHorizontal: Spacing[4], marginBottom: Spacing[3] },
+  wrapper: { marginHorizontal: Spacing[4], marginBottom: Spacing[3] },
   ribbon: { alignSelf: 'flex-start', borderRadius: Radius.full, paddingHorizontal: Spacing[2.5], paddingVertical: Spacing[1], flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: Spacing[3] },
-  ribbonText: { color: '#fff', fontSize: Typography.sizes.xs, fontWeight: '700' },
+  ribbonText: { color: '#fff', fontSize: Typography.roles.meta.lg, fontWeight: '700' },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing[2] },
-  name: { fontSize: Typography.sizes.lg, fontWeight: '700' },
-  address: { fontSize: Typography.sizes.sm, marginTop: 2 },
+  name: { fontSize: Typography.roles.subtitle.md, fontWeight: '700' },
+  address: { fontSize: Typography.roles.body.sm, marginTop: 2 },
   fuelBadge: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
-  metaRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: Spacing[2], marginTop: Spacing[3] },
-  queueBadge: { borderRadius: Radius.full, paddingHorizontal: Spacing[2.5], paddingVertical: Spacing[1], flexDirection: 'row', alignItems: 'center', gap: 6 },
-  queueDot: { width: 7, height: 7, borderRadius: 3.5 },
-  queueText: { fontSize: Typography.sizes.xs, fontWeight: '700' },
-  metaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  metaText: { fontSize: Typography.sizes.xs, fontWeight: '500' },
+  statusRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: Spacing[2], marginTop: Spacing[3] },
   track: { marginTop: Spacing[3], height: 6, borderRadius: Radius.full, overflow: 'hidden' },
   fill: { height: '100%', borderRadius: Radius.full },
   footer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: Spacing[3] },
-  confidence: { fontSize: Typography.sizes.sm, fontWeight: '600' },
 });

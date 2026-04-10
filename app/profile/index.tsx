@@ -11,6 +11,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useTheme } from "@/context/ThemeContext";
 import { Radius, Shadows, Spacing, Typography, Colors } from "@/constants/design";
 import * as Haptics from "expo-haptics";
+import { IconButton, PanelCard, ScreenHeader } from "@/components/ui-system";
 
 const SettingsItem: React.FC<{
   icon: React.ReactNode;
@@ -65,17 +66,16 @@ export default function ProfilePage() {
         style={[styles.hero, { paddingTop: insets.top + Spacing[1] }]}
       >
         <View style={styles.header}>
-          <TouchableOpacity style={[styles.headerBtn, { backgroundColor: theme.surface }]} onPress={handleGoBack}>
-            <ChevronLeft size={20} color={theme.text.primary} />
-          </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: theme.text.primary }]}>Profile</Text>
-          <TouchableOpacity style={[styles.headerBtn, { backgroundColor: theme.surface }]}>
-            <Settings size={17} color={theme.text.primary} />
-          </TouchableOpacity>
+          <ScreenHeader
+            title="Profile"
+            centerTitle
+            leftAction={<IconButton onPress={handleGoBack} icon={<ChevronLeft size={22} color={theme.text.primary} />} />}
+            rightActions={<IconButton icon={<Settings size={18} color={theme.text.primary} />} />}
+          />
         </View>
 
-        <View style={[styles.profileCard, { backgroundColor: theme.surface, borderColor: theme.border, ...Shadows.sm }]}>
-          <View style={[styles.avatar, { backgroundColor: theme.surfacePressed }]}><User size={30} color={theme.text.secondary} /></View>
+        <PanelCard style={styles.profileCard}>
+          <View style={[styles.avatar, { backgroundColor: theme.surfacePressed }]}><User size={38} color={theme.text.secondary} /></View>
           <Text style={[styles.userName, { color: theme.text.primary }]}>Fuel Finder User</Text>
           <Text style={[styles.userSubtitle, { color: theme.text.tertiary }]}>Community Contributor</Text>
           <View style={styles.statsRow}>
@@ -83,7 +83,7 @@ export default function ProfilePage() {
             <StatCard value="48" label="Helpful" icon={<Star size={18} />} color={Colors.warning.DEFAULT} />
             <StatCard value="156" label="Points" icon={<Zap size={18} />} color={Colors.success.DEFAULT} />
           </View>
-        </View>
+        </PanelCard>
       </LinearGradient>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: Spacing[4], paddingTop: Spacing[3], paddingBottom: insets.bottom + Spacing[5], gap: Spacing[3] }}>
@@ -112,23 +112,21 @@ export default function ProfilePage() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  hero: { paddingHorizontal: Spacing[4], paddingBottom: Spacing[2] },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: Spacing[3] },
-  headerBtn: { width: 40, height: 40, borderRadius: Radius.lg, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { fontSize: Typography.sizes.xl, fontWeight: '700' },
-  profileCard: { borderWidth: 1, borderRadius: Radius.lg, padding: Spacing[3.5], alignItems: 'center', gap: Spacing[1] },
-  avatar: { width: 68, height: 68, borderRadius: 34, alignItems: 'center', justifyContent: 'center' },
-  userName: { fontSize: Typography.sizes.xl, lineHeight: 24, fontWeight: '700' },
-  userSubtitle: { fontSize: Typography.sizes.sm, lineHeight: 16, marginBottom: Spacing[1.5] },
-  statsRow: { flexDirection: 'row', gap: Spacing[1.5], width: '100%' },
-  statCard: { flex: 1, borderWidth: 1, borderRadius: Radius.lg, paddingVertical: Spacing[2], alignItems: 'center', gap: 4 },
-  statIcon: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  statValue: { fontSize: Typography.sizes.lg, fontWeight: '700', lineHeight: 20 },
-  statLabel: { fontSize: Typography.sizes.xs, fontWeight: '500' },
-  section: { borderWidth: 1, borderRadius: Radius.lg, overflow: 'hidden' },
-  sectionTitle: { fontSize: Typography.sizes.xs, fontWeight: '700', letterSpacing: 0.35, marginHorizontal: Spacing[4], marginTop: Spacing[3], marginBottom: Spacing[1.5] },
-  settingsItem: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing[4], paddingVertical: Spacing[2.5], borderBottomWidth: 1, gap: Spacing[2.5] },
-  settingsIcon: { width: 36, height: 36, borderRadius: Radius.md, alignItems: 'center', justifyContent: 'center' },
+  hero: { paddingHorizontal: Spacing[4], paddingBottom: Spacing[4] },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: Spacing[4] },
+  profileCard: { borderWidth: 1, borderRadius: Radius['2xl'], padding: Spacing[5], alignItems: 'center', gap: Spacing[2] },
+  avatar: { width: 92, height: 92, borderRadius: 46, alignItems: 'center', justifyContent: 'center', marginBottom: Spacing[1] },
+  userName: { fontSize: Typography.sizes['2xl'], fontWeight: '700' },
+  userSubtitle: { fontSize: Typography.sizes.base, marginBottom: Spacing[2] },
+  statsRow: { flexDirection: 'row', gap: Spacing[2], width: '100%' },
+  statCard: { flex: 1, borderWidth: 1, borderRadius: Radius.lg, paddingVertical: Spacing[3], alignItems: 'center', gap: 6 },
+  statIcon: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  statValue: { fontSize: Typography.sizes.xl, fontWeight: '700' },
+  statLabel: { fontSize: Typography.sizes.sm, fontWeight: '500' },
+  section: { borderWidth: 1, borderRadius: Radius.xl, overflow: 'hidden' },
+  sectionTitle: { fontSize: Typography.sizes.sm, fontWeight: '700', letterSpacing: 0.8, marginHorizontal: Spacing[4], marginTop: Spacing[4], marginBottom: Spacing[2] },
+  settingsItem: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing[4], paddingVertical: Spacing[3], borderBottomWidth: 1, gap: Spacing[3] },
+  settingsIcon: { width: 42, height: 42, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
   settingsContent: { flex: 1 },
   settingsTitle: { fontSize: Typography.sizes.base, fontWeight: '600' },
   settingsSubtitle: { fontSize: Typography.sizes.xs, marginTop: 1 },

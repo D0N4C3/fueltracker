@@ -18,6 +18,7 @@ import {
 } from "@/constants/design";
 import { getQueueLevelText, getFuelStatusText, formatTimeAgo } from "@/mocks/stations";
 import { AnimatedButton } from "@/components/AnimatedButton";
+import { IconButton, MetricRow, PanelCard, ScreenHeader, StatusPill } from "@/components/ui-system";
 import * as Haptics from "expo-haptics";
 
 // Visual Queue Indicator
@@ -299,15 +300,12 @@ export default function PremiumStationDetailPage() {
       <Animated.View style={[styles.animatedHeader, { opacity: headerOpacity, paddingTop: insets.top }]}>
         <BlurView intensity={isDark ? 30 : 80} tint={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFill} />
         <View style={styles.animatedHeaderContent}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.headerBtn}>
-            <ChevronLeft size={24} color={theme.text.primary} />
-          </TouchableOpacity>
-          <Text style={[styles.animatedHeaderTitle, { color: theme.text.primary }]} numberOfLines={1}>
-            {station.name}
-          </Text>
-          <TouchableOpacity onPress={handleShare} style={styles.headerBtn}>
-            <Share2 size={20} color={theme.text.primary} />
-          </TouchableOpacity>
+          <ScreenHeader
+            title={station.name}
+            centerTitle
+            leftAction={<IconButton onPress={() => router.back()} icon={<ChevronLeft size={22} color={theme.text.primary} />} />}
+            rightActions={<IconButton onPress={handleShare} icon={<Share2 size={18} color={theme.text.primary} />} />}
+          />
         </View>
       </Animated.View>
 
@@ -326,18 +324,8 @@ export default function PremiumStationDetailPage() {
         >
           {/* Header Buttons */}
           <View style={styles.heroHeader}>
-            <TouchableOpacity 
-              onPress={() => router.back()} 
-              style={[styles.heroBtn, { backgroundColor: 'rgba(255,255,255,0.2)' }]}
-            >
-              <ChevronLeft size={24} color="#fff" />
-            </TouchableOpacity>
-            <TouchableOpacity 
-              onPress={handleShare} 
-              style={[styles.heroBtn, { backgroundColor: 'rgba(255,255,255,0.2)' }]}
-            >
-              <Share2 size={20} color="#fff" />
-            </TouchableOpacity>
+            <IconButton onPress={() => router.back()} inverted icon={<ChevronLeft size={22} color="#fff" />} />
+            <IconButton onPress={handleShare} inverted icon={<Share2 size={18} color="#fff" />} />
           </View>
 
           {/* Station Info */}
@@ -407,17 +395,19 @@ export default function PremiumStationDetailPage() {
           </View>
 
           {/* Queue Visualization */}
-          <View style={[styles.section, { backgroundColor: theme.surface, ...Shadows.sm }]}>
+          <PanelCard style={styles.section}>
             <Text style={[styles.sectionTitle, { color: theme.text.primary }]}>Current Queue</Text>
             <QueueVisualizer level={station.currentStatus.queueLevel} />
-          </View>
+          </PanelCard>
 
           {/* Quick Report */}
-          <View style={[styles.section, { backgroundColor: theme.surface, ...Shadows.sm }]}>
-            <Text style={[styles.sectionTitle, { color: theme.text.primary }]}>Quick Report</Text>
-            <Text style={[styles.sectionSubtitle, { color: theme.text.secondary }]}>
-              Help others by updating the status
-            </Text>
+          <PanelCard style={styles.section}>
+            <View style={styles.quickBlock}>
+              <Text style={[styles.sectionTitle, { color: theme.text.primary }]}>Quick Report</Text>
+              <Text style={[styles.sectionSubtitle, { color: theme.text.secondary }]}>
+                Help others by updating the status
+              </Text>
+            </View>
 
             {showSuccess ? (
               <View style={styles.successBox}>
@@ -432,54 +422,63 @@ export default function PremiumStationDetailPage() {
                 </Text>
               </View>
             ) : (
-              <>
-                <Text style={[styles.optionLabel, { color: theme.text.secondary }]}>Queue Status</Text>
-                <View style={styles.optionsGrid}>
-                  {(['none', 'short', 'medium', 'long'] as QueueLevel[]).map(level => (
-                    <QueueOption
-                      key={level}
-                      level={level}
-                      selected={selectedQueue === level}
-                      onPress={() => setSelectedQueue(level)}
-                    />
-                  ))}
+              <View style={styles.quickReportStack}>
+                <View style={styles.quickBlock}>
+                  <StatusPill label="Queue status" color={getQueueColor(selectedQueue || station.currentStatus.queueLevel)} />
+                  <View style={styles.optionsGrid}>
+                    {(['none', 'short', 'medium', 'long'] as QueueLevel[]).map(level => (
+                      <QueueOption
+                        key={level}
+                        level={level}
+                        selected={selectedQueue === level}
+                        onPress={() => setSelectedQueue(level)}
+                      />
+                    ))}
+                  </View>
                 </View>
 
-                <Text style={[styles.optionLabel, { color: theme.text.secondary, marginTop: Spacing[4] }]}>
-                  Fuel Availability
-                </Text>
-                <View style={styles.optionsGrid}>
-                  {(['both', 'petrol', 'diesel', 'none'] as FuelType[]).map(status => (
-                    <FuelOption
-                      key={status}
-                      status={status}
-                      selected={selectedFuel === status}
-                      onPress={() => setSelectedFuel(status)}
-                    />
-                  ))}
+                <View style={styles.quickBlock}>
+                  <StatusPill label="Fuel availability" color={getFuelColor(selectedFuel || station.currentStatus.fuelAvailable)} />
+                  <View style={styles.optionsGrid}>
+                    {(['both', 'petrol', 'diesel', 'none'] as FuelType[]).map(status => (
+                      <FuelOption
+                        key={status}
+                        status={status}
+                        selected={selectedFuel === status}
+                        onPress={() => setSelectedFuel(status)}
+                      />
+                    ))}
+                  </View>
                 </View>
 
-                <AnimatedButton
-                  onPress={handleSubmit}
-                  disabled={!selectedQueue || !selectedFuel || submitting}
-                  loading={submitting}
-                  style={{ marginTop: Spacing[5] }}
-                  fullWidth
-                >
-                  {submitting ? 'Submitting...' : 'Submit Report'}
-                </AnimatedButton>
-              </>
+                <View style={styles.quickBlock}>
+                  <MetricRow
+                    icon={<CheckCircle size={14} color={theme.text.tertiary} />}
+                    label="confidence"
+                    value={`${Math.round(station.currentStatus.confidence * 100)}%`}
+                  />
+                  <AnimatedButton
+                    onPress={handleSubmit}
+                    disabled={!selectedQueue || !selectedFuel || submitting}
+                    loading={submitting}
+                    style={{ marginTop: Spacing[3] }}
+                    fullWidth
+                  >
+                    {submitting ? 'Submitting...' : 'Submit Report'}
+                  </AnimatedButton>
+                </View>
+              </View>
             )}
-          </View>
+          </PanelCard>
 
           {/* Insights */}
-          <View style={[styles.section, { backgroundColor: theme.surface, ...Shadows.sm }]}>
+          <PanelCard style={styles.section}>
             <Text style={[styles.sectionTitle, { color: theme.text.primary }]}>Insights</Text>
             
             <View style={styles.insightsGrid}>
               <View style={[styles.insightCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }]}>
-                <View style={[styles.insightIcon, { backgroundColor: Colors.warning.light }]}>
-                  <Star size={20} color={Colors.warning.DEFAULT} />
+                <View style={[styles.insightIcon, { backgroundColor: theme.surfacePressed }]}>
+                  <Star size={20} color={theme.accent} />
                 </View>
                 <View>
                   <Text style={[styles.insightValue, { color: theme.text.primary }]}>
@@ -490,8 +489,8 @@ export default function PremiumStationDetailPage() {
               </View>
               
               <View style={[styles.insightCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }]}>
-                <View style={[styles.insightIcon, { backgroundColor: Colors.info.light }]}>
-                  <Timer size={20} color={Colors.info.DEFAULT} />
+                <View style={[styles.insightIcon, { backgroundColor: theme.surfacePressed }]}>
+                  <Timer size={20} color={theme.accent} />
                 </View>
                 <View>
                   <Text style={[styles.insightValue, { color: theme.text.primary }]}>
@@ -501,7 +500,7 @@ export default function PremiumStationDetailPage() {
                 </View>
               </View>
             </View>
-          </View>
+          </PanelCard>
 
           {/* Station Details */}
           <View style={[styles.section, { backgroundColor: theme.surface, ...Shadows.sm }]}>
@@ -708,8 +707,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   section: {
-    padding: Spacing[5],
-    borderRadius: Radius.xl,
+    gap: Spacing[3],
   },
   sectionTitle: {
     fontSize: Typography.sizes.xl,
@@ -743,11 +741,8 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.xs,
     fontWeight: '500',
   },
-  optionLabel: {
-    fontSize: Typography.sizes.sm,
-    fontWeight: '600',
-    marginBottom: Spacing[3],
-  },
+  quickReportStack: { gap: Spacing[4] },
+  quickBlock: { gap: Spacing[2] },
   optionsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
