@@ -16,8 +16,8 @@ function RootNavigation() {
   return (
     <Stack screenOptions={{ headerBackTitle: "Back", animation: "slide_from_right" }}>
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="stations" options={{ headerShown: false }} />
-      <Stack.Screen name="profile" options={{ headerShown: false }} />
+      <Stack.Screen name="stations/index" options={{ headerShown: false }} />
+      <Stack.Screen name="profile/index" options={{ headerShown: false }} />
       <Stack.Screen 
         name="station/[id]" 
         options={{ 
