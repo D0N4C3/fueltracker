@@ -680,7 +680,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: Spacing[4],
-    paddingVertical: Spacing[3],
+    paddingVertical: Spacing[2.5],
   },
   logoSection: {
     flexDirection: 'row',
@@ -705,18 +705,18 @@ const styles = StyleSheet.create({
   },
   headerActions: {
     flexDirection: 'row',
-    gap: Spacing[2],
+    gap: Spacing[1.5],
   },
   iconButton: {
-    width: 40,
-    height: 40,
+    width: 38,
+    height: 38,
     borderRadius: Radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },
   filterButton: {
-    width: 40,
-    height: 40,
+    width: 38,
+    height: 38,
     borderRadius: Radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
@@ -877,7 +877,6 @@ const styles = StyleSheet.create({
   sectionHeader: {
     marginTop: Spacing[4],
     marginBottom: Spacing[3],
-    marginHorizontal: Spacing[4],
   },
   sectionTitle: {
     fontSize: Typography.sizes.lg,

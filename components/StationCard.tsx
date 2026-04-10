@@ -174,7 +174,7 @@ export const StationCard: React.FC<StationCardProps> = ({
           <FuelBadge status={station.currentStatus.fuelAvailable} />
         </View>
 
-        <View style={styles.divider} />
+        <View style={[styles.divider, { backgroundColor: theme.borderSubtle }]} />
 
         <View style={styles.statsRow}>
           <QueueBadge level={station.currentStatus.queueLevel} />
@@ -199,7 +199,7 @@ export const StationCard: React.FC<StationCardProps> = ({
         <QueueProgressBar level={station.currentStatus.queueLevel} />
 
         <View style={styles.footer}>
-          <View style={styles.confidenceBadge}>
+          <View style={[styles.confidenceBadge, { backgroundColor: theme.surfacePressed }]}>
             <Text style={[styles.confidenceText, { color: theme.text.tertiary }]}>
               {Math.round(station.currentStatus.confidence * 100)}% confidence
             </Text>

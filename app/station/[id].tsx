@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useRef } from "react";
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Animated, Share } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, Animated, Share } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { 
@@ -265,6 +265,18 @@ export default function PremiumStationDetailPage() {
     }
   }, [station]);
 
+  const trendIcon = useMemo(() => {
+    if (!station) {
+      return <Minus size={18} color={theme.text.tertiary} />;
+    }
+
+    switch (station.currentStatus.trend) {
+      case 'increasing': return <TrendingUp size={18} color={Colors.error.DEFAULT} />;
+      case 'decreasing': return <TrendingDown size={18} color={Colors.success.DEFAULT} />;
+      default: return <Minus size={18} color={theme.text.tertiary} />;
+    }
+  }, [station, theme.text.tertiary]);
+
   if (!station) {
     return (
       <View style={[styles.container, styles.center, { backgroundColor: theme.background }]}>
@@ -276,14 +288,6 @@ export default function PremiumStationDetailPage() {
       </View>
     );
   }
-
-  const trendIcon = useMemo(() => {
-    switch (station.currentStatus.trend) {
-      case 'increasing': return <TrendingUp size={18} color={Colors.error.DEFAULT} />;
-      case 'decreasing': return <TrendingDown size={18} color={Colors.success.DEFAULT} />;
-      default: return <Minus size={18} color={theme.text.tertiary} />;
-    }
-  }, [station.currentStatus.trend, theme.text.tertiary]);
 
   const gradientColors = isDark 
     ? [Colors.primary[900], Colors.primary[800]] as const
@@ -307,13 +311,12 @@ export default function PremiumStationDetailPage() {
         </View>
       </Animated.View>
 
-      <ScrollView
+      <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + Spacing[8] }}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true }
-        )}
+        onScroll={(event) => {
+          scrollY.setValue(event.nativeEvent.contentOffset.y);
+        }}
         scrollEventThrottle={16}
       >
         {/* Hero Section */}
@@ -543,7 +546,7 @@ export default function PremiumStationDetailPage() {
             </View>
           </View>
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
     </View>
   );
 }

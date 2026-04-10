@@ -2,14 +2,13 @@ import React, { useState, useMemo, useCallback } from "react";
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, TextInput, RefreshControl } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { ChevronLeft, Search, SlidersHorizontal, Fuel, X } from "lucide-react-native";
+import { ChevronLeft, Search, SlidersHorizontal, X } from "lucide-react-native";
 import { BlurView } from "expo-blur";
 import { useTheme } from "@/context/ThemeContext";
 import { useFuel } from "@/context/FuelContext";
 import { useLocation } from "@/context/LocationContext";
 import { FuelStation } from "@/types";
-import { Radius, Shadows, Spacing, Typography, Colors } from "@/constants/design";
-import { ThemeColors } from "@/constants/colors";
+import { Radius, Spacing, Typography, Colors, Shadows } from "@/constants/design";
 import { StationCard } from "@/components/StationCard";
 import { SkeletonList } from "@/components/Skeleton";
 import { EmptyState } from "@/components/EmptyState";
@@ -32,8 +31,8 @@ const FilterChip: React.FC<{
   onPress: () => void;
   color?: string;
 }> = ({ label, active, onPress, color }) => {
-  const { theme } = useTheme();
-  
+  const { theme, isDark } = useTheme();
+
   return (
     <TouchableOpacity
       style={[
@@ -41,11 +40,13 @@ const FilterChip: React.FC<{
         {
           backgroundColor: active ? (color || theme.accent) : theme.surface,
           borderColor: active ? (color || theme.accent) : theme.border,
+          ...(active ? Shadows.sm : {}),
         },
       ]}
       onPress={onPress}
+      activeOpacity={0.9}
     >
-      <Text style={[styles.filterChipText, { color: active ? '#fff' : theme.text.secondary }]}>
+      <Text style={[styles.filterChipText, { color: active ? '#fff' : isDark ? theme.text.secondary : theme.text.primary }]}>
         {label}
       </Text>
     </TouchableOpacity>
@@ -58,16 +59,21 @@ const SortOption: React.FC<{
   onPress: () => void;
 }> = ({ label, active, onPress }) => {
   const { theme } = useTheme();
-  
+
   return (
     <TouchableOpacity
-      style={[styles.sortOption, { backgroundColor: active ? `${theme.accent}15` : 'transparent' }]}
+      style={[
+        styles.sortOption,
+        {
+          backgroundColor: active ? `${theme.accent}16` : theme.surface,
+          borderColor: active ? `${theme.accent}50` : theme.border,
+        },
+      ]}
       onPress={onPress}
     >
-      <Text style={[styles.sortOptionText, { color: active ? theme.accent : theme.text.secondary }]}>
+      <Text style={[styles.sortOptionText, { color: active ? theme.accent : theme.text.secondary }]}> 
         {label}
       </Text>
-      {active && <View style={[styles.sortIndicator, { backgroundColor: theme.accent }]} />}
     </TouchableOpacity>
   );
 };
@@ -84,8 +90,8 @@ export default function StationsListPage() {
   const [sortBy, setSortBy] = useState<'distance' | 'queue' | 'updated'>('distance');
 
   const stationsWithDistance = useMemo(() => {
-    if (!location) return stations.map(s => ({ ...s, distance: undefined as number | undefined }));
-    return stations.map(station => ({
+    if (!location) return stations.map((s) => ({ ...s, distance: undefined as number | undefined }));
+    return stations.map((station) => ({
       ...station,
       distance: calculateDistance(
         location.latitude,
@@ -97,10 +103,10 @@ export default function StationsListPage() {
   }, [stations, location]);
 
   const filteredStations = useMemo(() => {
-    let result = stationsWithDistance.filter(station => {
+    const result = stationsWithDistance.filter((station) => {
       if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        const matchesSearch = 
+        const query = searchQuery.toLowerCase().trim();
+        const matchesSearch =
           station.name.toLowerCase().includes(query) ||
           station.address.toLowerCase().includes(query) ||
           station.brand.toLowerCase().includes(query);
@@ -111,7 +117,7 @@ export default function StationsListPage() {
       if (filter === 'no-queue') return station.currentStatus.queueLevel === 'none';
       if (filter === 'petrol') return ['petrol', 'both'].includes(station.currentStatus.fuelAvailable);
       if (filter === 'diesel') return ['diesel', 'both'].includes(station.currentStatus.fuelAvailable);
-      
+
       return true;
     });
 
@@ -149,40 +155,41 @@ export default function StationsListPage() {
   }, [filter, searchQuery]);
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}> 
       <BlurView
-        intensity={isDark ? 30 : 80}
+        intensity={isDark ? 30 : 90}
         tint={isDark ? 'dark' : 'light'}
-        style={[styles.header, { paddingTop: insets.top }]}
+        style={[styles.header, { paddingTop: insets.top + Spacing[2] }]}
       >
         <View style={styles.headerContent}>
-          <TouchableOpacity 
-            style={[styles.headerBtn, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]} 
+          <TouchableOpacity
+            style={[styles.headerBtn, { backgroundColor: theme.surface, borderColor: theme.border }]}
             onPress={() => router.back()}
           >
-            <ChevronLeft size={24} color={theme.text.primary} />
+            <ChevronLeft size={22} color={theme.text.primary} />
           </TouchableOpacity>
-          
+
           <View style={styles.headerTitleContainer}>
-            <Text style={[styles.headerTitle, { color: theme.text.primary }]}>All Stations</Text>
+            <Text style={[styles.headerTitle, { color: theme.text.primary }]}>Stations</Text>
             <Text style={[styles.headerSubtitle, { color: theme.text.tertiary }]}>
-              {filteredStations.length} stations found
+              {filteredStations.length} matching
             </Text>
           </View>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[
-              styles.headerBtn, 
-              { 
-                backgroundColor: showFilters ? theme.accent : isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-              }
-            ]} 
+              styles.headerBtn,
+              {
+                backgroundColor: showFilters ? theme.accent : theme.surface,
+                borderColor: showFilters ? theme.accent : theme.border,
+              },
+            ]}
             onPress={() => setShowFilters(!showFilters)}
           >
-            <SlidersHorizontal size={20} color={showFilters ? '#fff' : theme.text.primary} />
+            <SlidersHorizontal size={18} color={showFilters ? '#fff' : theme.text.primary} />
             {activeFiltersCount > 0 && (
-              <View style={[styles.badge, { backgroundColor: showFilters ? '#fff' : Colors.error.DEFAULT }]}>
-                <Text style={[styles.badgeText, { color: showFilters ? theme.accent : '#fff' }]}>
+              <View style={[styles.badge, { backgroundColor: showFilters ? '#fff' : Colors.error.DEFAULT }]}> 
+                <Text style={[styles.badgeText, { color: showFilters ? theme.accent : '#fff' }]}> 
                   {activeFiltersCount}
                 </Text>
               </View>
@@ -190,11 +197,11 @@ export default function StationsListPage() {
           </TouchableOpacity>
         </View>
 
-        <View style={[styles.searchContainer, { backgroundColor: theme.surface }]}>
-          <Search size={20} color={theme.text.tertiary} />
+        <View style={[styles.searchContainer, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+          <Search size={18} color={theme.text.tertiary} />
           <TextInput
             style={[styles.searchInput, { color: theme.text.primary }]}
-            placeholder="Search stations..."
+            placeholder="Search by name, brand, area"
             placeholderTextColor={theme.text.tertiary}
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -208,7 +215,7 @@ export default function StationsListPage() {
 
         {showFilters && (
           <View style={styles.filtersSection}>
-            <View style={styles.filterChips}>
+            <View style={styles.filterRow}>
               <FilterChip label="All" active={filter === 'all'} onPress={() => setFilter('all')} />
               <FilterChip label="Available" active={filter === 'available'} onPress={() => setFilter('available')} color={Colors.fuel.available} />
               <FilterChip label="No Queue" active={filter === 'no-queue'} onPress={() => setFilter('no-queue')} color={Colors.queue.none} />
@@ -216,11 +223,11 @@ export default function StationsListPage() {
               <FilterChip label="Diesel" active={filter === 'diesel'} onPress={() => setFilter('diesel')} color={Colors.fuel.diesel} />
             </View>
 
-            <Text style={[styles.sortTitle, { color: theme.text.secondary }]}>Sort by</Text>
+            <Text style={[styles.sortTitle, { color: theme.text.secondary }]}>Sort</Text>
             <View style={styles.sortOptions}>
               <SortOption label="Distance" active={sortBy === 'distance'} onPress={() => setSortBy('distance')} />
               <SortOption label="Queue" active={sortBy === 'queue'} onPress={() => setSortBy('queue')} />
-              <SortOption label="Last Updated" active={sortBy === 'updated'} onPress={() => setSortBy('updated')} />
+              <SortOption label="Updated" active={sortBy === 'updated'} onPress={() => setSortBy('updated')} />
             </View>
           </View>
         )}
@@ -229,7 +236,10 @@ export default function StationsListPage() {
       {isLoading ? (
         <SkeletonList count={5} />
       ) : filteredStations.length === 0 ? (
-        <EmptyState type={searchQuery ? 'no-results' : 'no-stations'} onAction={searchQuery ? clearSearch : () => setFilter('all')} />
+        <EmptyState
+          type={searchQuery ? 'no-results' : 'no-stations'}
+          onAction={searchQuery ? clearSearch : () => setFilter('all')}
+        />
       ) : (
         <FlatList
           data={filteredStations}
@@ -238,11 +248,11 @@ export default function StationsListPage() {
             <StationCard station={item} distance={item.distance} onPress={handleStationPress} />
           )}
           contentContainerStyle={{
-            paddingTop: Spacing[4],
-            paddingBottom: insets.bottom + Spacing[4],
+            paddingTop: Spacing[3],
+            paddingBottom: insets.bottom + Spacing[6],
           }}
           showsVerticalScrollIndicator={false}
-          ItemSeparatorComponent={() => <View style={{ height: Spacing[2] }} />}
+          ItemSeparatorComponent={() => <View style={{ height: Spacing[1] }} />}
           refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refreshStations} tintColor={theme.accent} />}
         />
       )}
@@ -251,36 +261,109 @@ export default function StationsListPage() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: ThemeColors.background },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 },
-  backBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: ThemeColors.surface, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { flex: 1, fontSize: 20, fontWeight: '700', color: ThemeColors.text, textAlign: 'center' },
-  placeholder: { width: 40 },
-  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: ThemeColors.surface, marginHorizontal: 20, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, gap: 8, borderWidth: 1, borderColor: ThemeColors.border },
-  searchInput: { flex: 1, fontSize: 15, color: ThemeColors.text },
-  listContent: { padding: 20, gap: 12 },
-  card: { backgroundColor: ThemeColors.surface, borderRadius: 16, padding: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 },
-  cardTitleSection: { flex: 1, marginRight: 12 },
-  brandText: { fontSize: 11, color: ThemeColors.primary, fontWeight: '600', textTransform: 'uppercase' },
-  stationName: { fontSize: 16, fontWeight: '600', color: ThemeColors.text, marginTop: 2 },
-  fuelBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
-  fuelBadgeText: { fontSize: 10, color: 'white', fontWeight: '600' },
-  cardBody: { gap: 8 },
-  infoRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  addressText: { fontSize: 13, color: ThemeColors.textSecondary, flex: 1 },
-  statsRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 4 },
-  divider: { width: 1, height: 14, backgroundColor: ThemeColors.border },
-  queueIndicator: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  queueDot: { width: 8, height: 8, borderRadius: 4 },
-  queueText: { fontSize: 12, fontWeight: '500' },
-  trendContainer: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  trendText: { fontSize: 11, fontWeight: '500' },
-  timeContainer: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  timeText: { fontSize: 11, color: ThemeColors.textMuted },
-  distanceRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
-  distanceText: { fontSize: 12, color: ThemeColors.primary, fontWeight: '500' },
-  emptyContainer: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60 },
-  emptyTitle: { fontSize: 18, fontWeight: '600', color: ThemeColors.text, marginTop: 16 },
+  container: { flex: 1 },
+  header: {
+    paddingHorizontal: Spacing[4],
+    paddingBottom: Spacing[4],
+    borderBottomLeftRadius: Radius['2xl'],
+    borderBottomRightRadius: Radius['2xl'],
+    overflow: 'hidden',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing[3],
+    marginBottom: Spacing[3],
+  },
+  headerBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: Radius.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+  },
+  headerTitleContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: Typography.sizes.xl,
+    fontWeight: '700',
+  },
+  headerSubtitle: {
+    fontSize: Typography.sizes.xs,
+    fontWeight: '500',
+    marginTop: 1,
+  },
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: Radius.xl,
+    paddingHorizontal: Spacing[3],
+    paddingVertical: Spacing[2.5],
+    borderWidth: 1,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: Typography.sizes.base,
+    marginLeft: Spacing[2],
+  },
+  filtersSection: {
+    marginTop: Spacing[3],
+    gap: Spacing[3],
+  },
+  filterRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing[2],
+  },
+  filterChip: {
+    paddingHorizontal: Spacing[3],
+    paddingVertical: Spacing[2],
+    borderRadius: Radius.full,
+    borderWidth: 1,
+  },
+  filterChipText: {
+    fontSize: Typography.sizes.xs,
+    fontWeight: '600',
+  },
+  sortTitle: {
+    fontSize: Typography.sizes.xs,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+  },
+  sortOptions: {
+    flexDirection: 'row',
+    gap: Spacing[2],
+  },
+  sortOption: {
+    flex: 1,
+    borderRadius: Radius.lg,
+    paddingVertical: Spacing[2],
+    paddingHorizontal: Spacing[2.5],
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  sortOptionText: {
+    fontSize: Typography.sizes.xs,
+    fontWeight: '600',
+  },
 });
-// TIMESTAMP_1775756619
