@@ -17,7 +17,7 @@
       "bundleIdentifier": "com.interethiopia.fueltracker"
     },
     "android": {
-      "package": "com.interethiopia.interir",
+      "package": "com.interethiopia.fueltracker",
       "versionCode": 4,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
